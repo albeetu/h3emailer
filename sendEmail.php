@@ -5,8 +5,13 @@ $batches = 200;
 $batch = 0;
 $totalrecs = 0;
 $used = array();
-if (($handle = fopen("clients.txt", "r")) !== FALSE) 
+$files = array("A-D.txt","E-K.txt","L-R.txt","S-Z.txt","FSBO.txt");
+
+for ($f=0; $f < count($files); $f++)
 {
+  if (($handle = fopen($files[$f], "r")) !== FALSE) 
+  {
+    echo "\nProcessing ".$files[$f]."...\n";
     while (($data = fgetcsv($handle, 10000000, ",")) !== FALSE) 
     {
         $num = count($data);
@@ -36,8 +41,9 @@ if (($handle = fopen("clients.txt", "r")) !== FALSE)
         }
     }
     fclose($handle);
-echo "\n\n";
-echo "$totalrecs records produced\n";
-echo "$batch records bundled\n";}
-
+  echo "\n\n";
+  echo "$totalrecs records produced\n";
+  echo "$batch records bundled\n";
+  }
+}
 ?>
