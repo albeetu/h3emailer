@@ -1,11 +1,22 @@
 <?php
 
 $row = 1;
-$batches = 200;
+$batches = 250;
 $batch = 0;
 $totalrecs = 0;
 $used = array();
 $files = array("A-D.txt","E-K.txt","L-R.txt","S-Z.txt","FSBO.txt");
+$unsubscribe = "unsubscribe.txt";
+
+if (($handle = fopen("unsubscribe.txt,"r") !== FALSE)
+{
+  echo "\nLoading scrublist...\n";
+  while (($scrubList = fgetcsv($handle, 10000000, ",")) !== FALSE)
+  {
+    $num = count($scrubList);
+  }
+  echo $num." IDs blacklisted\n";
+}
 
 for ($f=0; $f < count($files); $f++)
 {
@@ -24,7 +35,14 @@ for ($f=0; $f < count($files); $f++)
             {
                echo "http://h3n.mlspin.com/Email/SendClientEmail.asp?ClientId=";
             }
-            echo $data[$c] . ",";
+            if (in_array($data[$c],$scrubList))
+            {
+                // List maintenance needed. Not sure what to do yet.
+            }
+            else
+            {
+                echo $data[$c] . ",";
+            }
             if (in_array($data[$c],$used))
             {
                 echo "repeat record ".$data[$c]."\n";
