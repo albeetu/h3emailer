@@ -8,16 +8,19 @@ $used = array();
 $files = array("A-D.txt","E-K.txt","L-R.txt","S-Z.txt","FSBO.txt");
 $unsubscribe = "unsubscribe.txt";
 
-if (($handle = fopen("unsubscribe.txt,"r") !== FALSE)
+if (($handle = fopen($unsubscribe,"r")) !== FALSE)
 {
   echo "\nLoading scrublist...\n";
-  while (($scrubList = fgetcsv($handle, 10000000, ",")) !== FALSE)
+  while (($uList = fgetcsv($handle, 10000000, ",")) !== FALSE)
   {
-    $num = count($scrubList);
+    $num = count($uList);
   }
-  echo $num." IDs blacklisted\n";
+  echo $uList[0];
+  echo $num ." IDs blacklisted\n";
+  $num = 0;
+  fclose($handle);
 }
-
+break;
 for ($f=0; $f < count($files); $f++)
 {
   if (($handle = fopen($files[$f], "r")) !== FALSE) 
@@ -41,7 +44,7 @@ for ($f=0; $f < count($files); $f++)
             }
             else
             {
-                echo $data[$c] . ",";
+                echo $data[$c] . ","; // correctly formed data
             }
             if (in_array($data[$c],$used))
             {
