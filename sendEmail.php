@@ -7,6 +7,8 @@ $totalrecs = 0;
 $used = array();
 $files = array("A-D.txt","E-K.txt","L-R.txt","S-Z.txt","FSBO.txt");
 $unsubscribe = "unsubscribe.txt";
+$scrubList = array();
+$removed = 0;
 
 if (($handle = fopen($unsubscribe,"r")) !== FALSE)
 {
@@ -14,13 +16,13 @@ if (($handle = fopen($unsubscribe,"r")) !== FALSE)
   while (($uList = fgetcsv($handle, 10000000, ",")) !== FALSE)
   {
     $num = count($uList);
+    $scrubList = $uList;
   }
-  echo $uList[0];
   echo $num ." IDs blacklisted\n";
   $num = 0;
   fclose($handle);
 }
-break;
+
 for ($f=0; $f < count($files); $f++)
 {
   if (($handle = fopen($files[$f], "r")) !== FALSE) 
@@ -29,7 +31,7 @@ for ($f=0; $f < count($files); $f++)
     while (($data = fgetcsv($handle, 10000000, ",")) !== FALSE) 
     {
         $num = count($data);
-        echo "\n\n$num in this batch\n\n";
+        echo "\n$num in this batch\n\n";
         $totalrecs += $num;
         $row++;
         for ($c=0; $c < $num; $c++) 
@@ -41,6 +43,7 @@ for ($f=0; $f < count($files); $f++)
             if (in_array($data[$c],$scrubList))
             {
                 // List maintenance needed. Not sure what to do yet.
+                $removed++;
             }
             else
             {
@@ -65,6 +68,7 @@ for ($f=0; $f < count($files); $f++)
   echo "\n\n";
   echo "$totalrecs records produced\n";
   echo "$batch records bundled\n";
+  echo "$removed additional records blacklisted\n";
   }
 }
 ?>
