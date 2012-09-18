@@ -7,17 +7,19 @@ $totalrecs = 0;
 $used = array();
 $files = array("A-D.txt","E-K.txt","L-R.txt","S-Z.txt","FSBO.txt");
 $unsubscribe = "unsubscribe.txt";
-$bList = array();
-$blistcount = 0;
+
+$scrubList = array();
+$remove = array();
+$removed = 0;
+
 if (($handle = fopen($unsubscribe,"r")) !== FALSE)
 {
-  echo "\nLoading scrublist ". $unsubscribe."...\n";
-  while (($uList = fgetcsv($handle, 1000000, ",")) !== FALSE)
+  echo "\nLoading scrublist...\n";
+  while (($uList = fgetcsv($handle, 100000000, ",")) !== FALSE)
   {
     $num = count($uList);
-    $bList = $uList;
+    $scrubList = $uList;
   }
-  print_r($bList);
   echo $num ." IDs blacklisted\n";
   $num = 0;
   fclose($handle);
@@ -31,8 +33,7 @@ for ($f=0; $f < count($files); $f++)
     while (($data = fgetcsv($handle, 10000000, ",")) !== FALSE) 
     {
         $num = count($data);
-        print_r($data);
-        echo "\n\n$num in this batch\n\n";
+        echo "\n$num in this batch\n\n";
         $totalrecs += $num;
         $row++;
         for ($c=0; $c < $num; $c++) 
@@ -41,9 +42,11 @@ for ($f=0; $f < count($files); $f++)
             {
                echo "http://h3n.mlspin.com/Email/SendClientEmail.asp?ClientId=";
             }
-            if (in_array($data[$c],$bList))
+            if (in_array($data[$c],$uList))
             {
-                $blistcount++;
+                // List maintenance needed. Not sure what to do yet.
+                $removed++;
+                array_push($remove,$data[$c]);
             }
             else
             {
@@ -68,7 +71,8 @@ for ($f=0; $f < count($files); $f++)
   echo "\n\n";
   echo "$totalrecs records produced\n";
   echo "$batch records bundled\n";
-  echo "$blistcount records need blacklisting\n";
+  echo "$removed additional records blacklisted\n";
+  print_r($remove);
   }
 }
 ?>
