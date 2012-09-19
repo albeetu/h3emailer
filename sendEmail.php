@@ -7,32 +7,11 @@ $totalrecs = 0;
 $used = array();
 $files = array("A-D.txt","E-K.txt","L-R.txt","S-Z.txt","FSBO.txt");
 $unsubscribe = "unsubscribe.txt";
-<<<<<<< HEAD
-
 $scrubList = array();
 $remove = array();
 $removed = 0;
-
-=======
-<<<<<<< HEAD
 $bList = array();
 $blistcount = 0;
->>>>>>> 6a843b306d87bf7404cdfe664f2f50602d25c83d
-if (($handle = fopen($unsubscribe,"r")) !== FALSE)
-{
-  echo "\nLoading scrublist...\n";
-  while (($uList = fgetcsv($handle, 100000000, ",")) !== FALSE)
-  {
-    $num = count($uList);
-    $scrubList = $uList;
-  }
-<<<<<<< HEAD
-=======
-  print_r($bList);
-=======
-$scrubList = array();
-$remove = array();
-$removed = 0;
 
 if (($handle = fopen($unsubscribe,"r")) !== FALSE)
 {
@@ -42,8 +21,6 @@ if (($handle = fopen($unsubscribe,"r")) !== FALSE)
     $num = count($uList);
     $scrubList = $uList;
   }
->>>>>>> 246a08f379c39cc2e2f5d5248a44e790d930cecb
->>>>>>> 6a843b306d87bf7404cdfe664f2f50602d25c83d
   echo $num ." IDs blacklisted\n";
   $num = 0;
   fclose($handle);
@@ -57,16 +34,8 @@ for ($f=0; $f < count($files); $f++)
     while (($data = fgetcsv($handle, 10000000, ",")) !== FALSE) 
     {
         $num = count($data);
-<<<<<<< HEAD
-        echo "\n$num in this batch\n\n";
-=======
-<<<<<<< HEAD
         print_r($data);
-        echo "\n\n$num in this batch\n\n";
-=======
         echo "\n$num in this batch\n\n";
->>>>>>> 246a08f379c39cc2e2f5d5248a44e790d930cecb
->>>>>>> 6a843b306d87bf7404cdfe664f2f50602d25c83d
         $totalrecs += $num;
         $row++;
         for ($c=0; $c < $num; $c++) 
@@ -75,21 +44,12 @@ for ($f=0; $f < count($files); $f++)
             {
                echo "http://h3n.mlspin.com/Email/SendClientEmail.asp?ClientId=";
             }
-            if (in_array($data[$c],$uList))
+            if (in_array($data[$c],$scrubList))
             {
-<<<<<<< HEAD
                 // List maintenance needed. Not sure what to do yet.
                 $removed++;
                 array_push($remove,$data[$c]);
-=======
-<<<<<<< HEAD
-                $blistcount++;
-=======
-                // List maintenance needed. Not sure what to do yet.
-                $removed++;
-                array_push($remove,$data[$c]);
->>>>>>> 246a08f379c39cc2e2f5d5248a44e790d930cecb
->>>>>>> 6a843b306d87bf7404cdfe664f2f50602d25c83d
+                $totalrecs--;
             }
             else
             {
@@ -114,17 +74,7 @@ for ($f=0; $f < count($files); $f++)
   echo "\n\n";
   echo "$totalrecs records produced\n";
   echo "$batch records bundled\n";
-<<<<<<< HEAD
   echo "$removed additional records blacklisted\n";
-  print_r($remove);
-=======
-<<<<<<< HEAD
-  echo "$blistcount records need blacklisting\n";
-=======
-  echo "$removed additional records blacklisted\n";
-  print_r($remove);
->>>>>>> 246a08f379c39cc2e2f5d5248a44e790d930cecb
->>>>>>> 6a843b306d87bf7404cdfe664f2f50602d25c83d
   }
 }
 ?>
