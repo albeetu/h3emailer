@@ -80,6 +80,7 @@ if ($resp->getResponseCode() == 302)
       echo $getFolder->getUrl()."\n";
       echo count($list[1]).' IDs for '.$foldernames[$i]."\n";
       echo implode(",",$list[1]);
+      echo "\n";
       fwrite($handle,implode(",",$list[1])); 
       //print_r($list);
      }
