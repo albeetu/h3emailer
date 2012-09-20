@@ -4,22 +4,25 @@ $userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.24 (KHTML, like Ge
 $folderids = array("10619","765","766","767","9432","1077");
 $foldernames = array("A-D.txt","E-K.txt","L-R.txt","S-Z.txt","unsubscribe.txt","FSBO.txt");
 
-// Get initial form
+// Read username/password file
 
 if (($userpass = fopen("userpass.txt","r")) !== FALSE)
 {
   $username = trim(fgets($userpass));
   $password = trim(fgets($userpass));
-  echo $username ."\n";
-  echo $password ."\n";
+//  echo $username ."\n";
+//  echo $password ."\n";
 
 }
 else
 {
-  echo "Need a userpass.txt file\n";
+  echo "Need a userpass.txt file. Exiting\n";
+  fclose($userpass);
   exit(2);
 }
 fclose($userpass);
+
+// Create inital logon
 
 $initReq = new HttpRequest('http://h3e.mlspin.com/signin.asp', HttpRequest::METH_POST);
 $initReq->setHeaders(array('User-Agent' => $userAgent));
@@ -28,31 +31,34 @@ try
   $resp = $initReq->send();
 } catch (HttpException $ex)
 {
-  echo $ex;
+  echo $ex.": Failed due to connection issue.";
+  exit(4);
 }
 
+// Send login 
+
 preg_match_all('/INPUT name="(\w+)"/',$initReq->getResponseMessage(),$matches);
+
 
 $r = new HttpRequest('http://h3e.mlspin.com/validate_new.asp', HttpRequest::METH_POST);
 $r->setHeaders(array('User-Agent' => $userAgent));
 $r->setPostFields(array($matches[1][0] => '0', 'Page_Loaded' =>'0','user_name' => $username, 'pass' => $password, 'signin' => 'Sign In'));
-//$r->enableCookies();
-try {
-     $resp = $r->send();
-} catch (HttpException $ex) {
-    echo $ex;
+try 
+{
+  $resp = $r->send();
+} catch (HttpException $ex) 
+{
+    echo $ex.": Logon failed due to connection issue.";
+    exit(4);
 }
 
+// First response should be a 302. But cookie is now captured. Start harvesting
 
 if ($resp->getResponseCode() == 302)
 {
 //  echo $r->getRequestMessage()."\n";
 //  echo $r->getResponseMessage()."\n";
   $headers = $r->getResponseHeader();
-//  print_r($headers);
-
-//  print_r($headers['Set-Cookie']);
-//  echo implode($headers['Set-Cookie']);
 
   for ($i =0; $i < count($folderids); $i++)
   {
@@ -79,9 +85,9 @@ if ($resp->getResponseCode() == 302)
       echo '--------------------Capture for '.$foldernames[$i]."--------------------\n";
       echo $getFolder->getUrl()."\n";
       echo count($list[1]).' IDs for '.$foldernames[$i]."\n";
-      echo implode(",",$list[1]);
-      echo "\n";
+//      echo implode(",",$list[1]);
       fwrite($handle,implode(",",$list[1])); 
+      echo '--------------------Completed for '.$foldernames[$i]."------------------\n";
       //print_r($list);
      }
      else
@@ -112,7 +118,7 @@ try{
 */
 //echo "--------------Test Request--------------------\n";
 //echo $redir->getRequestMessage()."\n";
-//echo "--------------Test Response------------------\n";
+//echo "--------------Tes Response------------------\n";
 //echo $redir->getResponseMessage()."\n";
 
 //echo "--------------Extract from unsubscribe-------\n";
