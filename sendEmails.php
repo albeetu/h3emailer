@@ -3,8 +3,8 @@
 //$userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24';
 $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:7.0.1) Gecko/20100101 Firefox/7.0.1';
 $emailRequestUrl = 'http://h3e.mlspin.com/Email/ACTION_SendClientEmail.asp';
-
-
+$emailFile = "emails.txt";
+$emailList = array();
 // Read username/password file
 
 if (($userpass = fopen("userpass.txt","r")) !== FALSE)
@@ -28,15 +28,41 @@ if (is_readable("messagetosend.txt"))
   preg_match_all('/(?P<subject>[\w\d\s\S]+)={10}(?P<body>[\w\d\s\S]+)/',file_get_contents("messagetosend.txt"),$matches);
   $messageSubject = trim($matches['subject'][0]);
   $messageToSend = trim(str_replace("\n","\r\n",$matches['body'][0]));
-  echo $messageToSend;
-  exi;
+  //echo $messageToSend;
 }
 else
 {
  // this read failed
  exit;
 }
-
+// Get clientIDs
+if (($emails = fopen($emailFile,"r")) !== FALSE)
+{
+  echo "=====Capturing ClientIDs======\n";
+  while (($eList = fgetcsv($emails, 100000000, ",")) !== FALSE)
+  {
+    $num += count($eList);
+    foreach($eList as $id)
+    {
+      if (is_numeric($id))
+      {
+        $batch .= "'".$id."',";
+      }
+    }
+    array_push($emailList,substr($batch,0,-1));
+    $batch = array();
+  }
+ print_r($emailList);
+exit;
+//  $emailList = array("'2818377','1591841'","'2818377','1591841'","'2818377','1591841'");
+  echo $num ." Client Ids ready to be emailed\n";
+}
+else
+{
+  echo $emailFile . "can't be opened\n";
+  exit(7);
+}
+  
 // Create inital logon
 
 $initReq = new HttpRequest('http://h3e.mlspin.com/signin.asp', HttpRequest::METH_POST);
@@ -89,8 +115,8 @@ echo $test->getRequestMessage()."\n";
 echo $test->getResponseMessage()."\n";
 
 //prepare file to open
-  if (($handle = fopen("emails.txt","r")) !== FALSE)
-  {
+      foreach ($emailList as $batch)
+      {
   //build request
       $emailRequest = new HttpRequest($emailRequestUrl,HttpRequest::METH_POST);
       $requestHeaders = array('Host' => 'h3e.mlspin.com',
@@ -104,28 +130,25 @@ echo $test->getResponseMessage()."\n";
                               'Cookie' => implode("; ",$headers['Set-Cookie']),
                               'Content-Type' => 'application/x-www-form-urlencoded');
       $emailRequest->setHeaders($requestHeaders);
-      $clientIds = "'2818377'";
+      $clientIds = $batch;
+      print_r($batch);
       $postFields = array('ClientId'=>$clientIds,
                           'from'=>'threadllc@gmail.com',
                           'subject'=> $messageSubject,
                           'message'=> $messageToSend);
       $emailRequest->setPostFields($postFields);
-    
       try
       {
-        $emailsend = $emailRequest->send();
+        //$emailsend = $emailRequest->send();
       }catch (HttpException $ex)
       {
         echo $ex;
       }
       echo $emailRequest->getRawRequestMessage()."\n==============================================\n";
       echo $emailRequest->getRawResponseMessage()."\n";
+      $emailRequest = null;
    }
-   else
-   {
-     //file didn't open
-   }
-   fclose($handle); 
+   exit;
 }
 else
 {
