@@ -1,5 +1,6 @@
 <?php
 
+
 $userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24';
 $folderids = array("10619","765","766","767","9432","1077");
 $foldernames = array("A-D.txt","E-K.txt","L-R.txt","S-Z.txt","unsubscribe.txt","FSBO.txt");

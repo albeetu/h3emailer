@@ -20,7 +20,10 @@ if (($handle = fopen($unsubscribe,"r")) !== FALSE)
   echo "Loading scrublist...\n";
   while (($uList = fgetcsv($handle, 100000000, ",")) !== FALSE)
   {
-    $num = count($uList);
+    $num += count($uList);
+  
+// Potential bug here. What if the file has more than one line? Leave alone for now.
+
     $scrubList = $uList;
   }
   echo $num ." IDs blacklisted\n";
@@ -31,7 +34,7 @@ if (($handle = fopen($unsubscribe,"r")) !== FALSE)
 
 if (($emails = fopen($emailFile,"w+")) !== FALSE)
 {
-  fwrite($emails,"=========H3 Requests=============\n");
+//  fwrite($emails,"=========H3 Requests=============\n");
 }
 else
 {
@@ -54,7 +57,6 @@ for ($f=0; $f < count($files); $f++)
             if ($c % $batches == 0)
             {
                echo "http://h3n.mlspin.com/Email/SendClientEmail.asp?ClientId=";
-               fwrite($emails,"http://h3n.mlspin.com/Email/SendClientEmail.asp?ClientID=");
             }
             if (in_array($data[$c],$scrubList))
             {
@@ -79,7 +81,7 @@ for ($f=0; $f < count($files); $f++)
             if ($c % $batches == $batches-1)
             {
                echo "\n\n";
-               fwrite($emails,"\n\n");
+               fwrite($emails,"\n");
                $batch++;
             }
         }
